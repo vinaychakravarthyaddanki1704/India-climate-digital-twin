@@ -1,13 +1,13 @@
 # 🌏 India Climate Digital Twin
 ### AI-Powered Digital Twin of India's Climate · NRSC / ISRO Hackathon — Problem Statement 5
 
-[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://your-app.streamlit.app)
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://india-climate-digital-twin-bpy9vcdf4cfvzdxqc6pfz4.streamlit.app/)
 
 ## Overview
 Real-time interactive Digital Twin of India's climate using GraphCast GNN + U-Net CNN bias correction, validated against IMD RF25 observations.
 
 ## 🔗 Live Demo
-**[View the app on Streamlit Cloud](https://your-app.streamlit.app)**
+**[View the app on Streamlit Cloud](https://india-climate-digital-twin-bpy9vcdf4cfvzdxqc6pfz4.streamlit.app/)**
 *(link will be updated after deployment)*
 
 ## Pipeline
