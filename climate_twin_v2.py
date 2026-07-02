@@ -152,41 +152,53 @@ def surface3d(arr, vmax, title="", label="mm/day", cs=RAIN_CS, vmin=0):
     return fig
 
 def map2d_plotly(data_dict, vmax, title="", label="mm/day", cs=RAIN_CS, vmin=0):
-    """Plotly flat 2D Mercator map of India — dark DestinE theme."""
+    LAT_1D = LAT_2D[:, 0]   # shape (129,)
+    LON_1D = LON_2D[0, :]   # shape (137,)
+
     traces = []
     show_bar = True
     for name, arr in data_dict.items():
-        v = np.isfinite(arr)
-        traces.append(go.Scattergeo(
-            lat=LAT_2D[v].ravel(), lon=LON_2D[v].ravel(),
-            mode='markers', name=name,
-            marker=dict(size=4, color=arr[v].ravel(),
-                        colorscale=cs, cmin=vmin, cmax=vmax,
-                        colorbar=dict(title=dict(text=label, side='right',
-                                                  font=dict(color='#7ab8d4')),
-                                      thickness=15, len=0.7,
-                                      bgcolor='rgba(3,11,26,0.8)',
-                                      tickfont=dict(color='#7ab8d4'),
-                                      bordercolor='#1a3a5c'),
-                        showscale=show_bar, opacity=0.95, symbol='square'),
+        traces.append(go.Heatmap(
+            z=arr, x=LON_1D, y=LAT_1D,
+            colorscale=cs, zmin=vmin, zmax=vmax,
+            colorbar=dict(
+                title=dict(text=label, side='right', font=dict(color='#7ab8d4')),
+                thickness=15, len=0.7, bgcolor='rgba(3,11,26,0.8)',
+                tickfont=dict(color='#7ab8d4'), bordercolor='#1a3a5c'),
+            showscale=show_bar, name=name,
+            hoverongaps=False,
             showlegend=len(data_dict) > 1))
         show_bar = False
+
+    # Draw state boundaries from shapefile
+    shp = os.path.join(BASE, "cnn-correction/cnn-correction/data/STATE_BDY_UPD/STATE_BDY_UPD.shp")
+    if os.path.exists(shp):
+        try:
+            gdf = gpd.read_file(shp)
+            for geom in gdf.geometry:
+                if geom is None: continue
+                polys = list(geom.geoms) if geom.geom_type == 'MultiPolygon' else [geom]
+                for poly in polys:
+                    xs, ys = poly.exterior.xy
+                    traces.append(go.Scatter(
+                        x=list(xs), y=list(ys), mode='lines',
+                        line=dict(color='#4a9aca', width=0.8),
+                        showlegend=False, hoverinfo='skip'))
+        except Exception:
+            pass
+
     fig = go.Figure(traces)
-    fig.update_geos(
-        projection_type="mercator",
-        lonaxis=dict(range=[66.5, 100.5]),
-        lataxis=dict(range=[6.5, 38.5]),
-        bgcolor="rgba(3,11,26,0)",
-        showland=True,  landcolor="#0d1f38",
-        showocean=True, oceancolor="#030b1a",
-        showcoastlines=True, coastlinecolor="#2a5a8a",
-        showcountries=True, countrycolor="#1a4a7a",
-        showsubunits=True, subunitcolor="#1a3a5c",
-        showframe=False)
     fig.update_layout(
-        title=dict(text=title, font=dict(color='#00c8ff', size=13), x=0.5),
-        paper_bgcolor="#030b1a",
+        title=dict(text=title, font=dict(color='#00c8ff', size=14),
+                   x=0.5, xanchor='center', pad=dict(t=8)),
+        paper_bgcolor='#030b1a', plot_bgcolor='#030b1a',
         margin=dict(l=0, r=0, t=55, b=0), height=500,
+        xaxis=dict(range=[66.5, 100.5], showgrid=False, zeroline=False,
+                   tickfont=dict(color='#7ab8d4'),
+                   title=dict(text='Lon (°E)', font=dict(color='#7ab8d4'))),
+        yaxis=dict(range=[6.5, 38.5], showgrid=False, zeroline=False,
+                   tickfont=dict(color='#7ab8d4'),
+                   title=dict(text='Lat (°N)', font=dict(color='#7ab8d4'))),
         legend=dict(bgcolor='rgba(3,11,26,0.9)', bordercolor='#1a3a5c',
                     font=dict(color='#7ab8d4')))
     return fig
