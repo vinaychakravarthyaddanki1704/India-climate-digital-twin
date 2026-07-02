@@ -405,6 +405,7 @@ elif "Temperature" in mode:
 
     def load_t(p):
         r=np.load(p); t=r if r.ndim==2 else (r[0] if r.ndim==3 else r[0,:,:,0])
+        if t.ndim==2: return msk(t if np.nanmax(t)>200 else t+273.15)-273.15
         return msk(np.nanmean(t,0))-273.15
 
     gc_t  = load_t(f"{GC_TEMP}/{sel}.npy")
