@@ -393,8 +393,9 @@ elif "Temperature" in mode:
     border-left:4px solid #ff8844;padding-left:1rem;margin-bottom:1rem;">
     🌡️ Monthly Temperature Monitor</div>""", unsafe_allow_html=True)
 
-    avail_t = sorted([os.path.basename(f).replace('.npy','')
-                      for f in glob.glob(f"{GC_TEMP}/*.npy")])
+    gc_months  = {os.path.basename(f).replace('.npy','') for f in glob.glob(f"{GC_TEMP}/*.npy")}
+    cnn_months = {os.path.basename(f).replace('.npy','') for f in glob.glob(f"{CNN_TEMP}/*.npy")}
+    avail_t = sorted(gc_months & cnn_months)
     if not avail_t: st.warning("No temperature files found."); st.stop()
 
     ca, cb_col = st.columns([3,1])
