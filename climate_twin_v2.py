@@ -404,7 +404,7 @@ elif "Temperature" in mode:
     yr, mo = int(sel[:4]), int(sel[5:])
 
     def load_t(p):
-        r=np.load(p); t=r if r.ndim==3 else r[:,:,:,0]
+        r=np.load(p); t=r if r.ndim==2 else (r[0] if r.ndim==3 else r[0,:,:,0])
         return msk(np.nanmean(t,0))-273.15
 
     gc_t  = load_t(f"{GC_TEMP}/{sel}.npy")
